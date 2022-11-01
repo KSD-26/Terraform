@@ -1,0 +1,90 @@
+`Variables in Terraform`
+
+- something set at runtime
+- allows you to vary what terraform will do when passing in or using a dynamic value
+- variable with undefined values will not directly result in ERROR
+    NOTE: Terraform will ask you to supply a value **IMPORTANT** 
+    ex:
+        variable custom_var {}
+- In version 0.12>=  :: var.instance_type declaration
+- In version 0.11<=  :: ${var.instance_type} declaration
+
+`3 types of variable types`
+1. Simple variable types
+    - String
+    - Number
+    - boolean
+
+    ex:
+        variable "aws_region"{
+            type=string #type enforcement
+            default="us-west-2"
+        }
+        variable "instance_count"{
+            type=Number
+            default=2
+        }
+        variable "enable_vpn_gateway"{
+            type=bool
+            default=false
+        }
+
+
+2. Collection Variable types (NOTE: all values of same type)
+    - list :: [] 
+    - map :: {k1=v1,k2=v2}
+    - set :: an unordered collection of unique Values
+
+    ex:
+        variable "private_subnet_cidr_blocks"{
+            type = list(string)
+            default=[
+                "10.0.101.0/24",
+                "10.0.102.0/24",
+                "10.0.103.0/24"
+            ]
+        }
+
+        variable "resouce_tags"{
+            type=map(string)
+            default={
+                project="project-alpha",
+                environment="dev"
+            }
+        }
+
+
+3. Structure Variable types
+    - tuple :: ficed-length sequence of values of specified types - ["a",15,true]
+    - object - A lookup table, matching a fixed set of keys to values of specified types
+
+-------------------------
+`Variable Precendence Order` (Highest to lowest)
+
+1. -var or -var-file on command line
+    ex:
+        terraform apply -auto-approve \
+        -var "aws_access_key=<KEY>" \
+        -var "aws_secret_key="<KEY>"
+
+2. *.auto.tfvars or *.auto.tfvars.json
+
+3. terraform.tfvars
+    ex:
+        instance_type="t2.large"
+
+4. variables.tf
+    ex:
+        variable "instance_type"{
+            default="t2.micro"
+        }
+
+5. environment variables
+    - can be used to set a variable
+    - must be in format TF_VAR_name
+    ex:
+        .bashrc
+        export TF_VAR_instance_type=t2.micro
+        export TF_VAR_ami=ami-12345abc
+
+-----------------------------

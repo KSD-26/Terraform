@@ -1,0 +1,27 @@
+`Data Sources`
+
+- used to fetch data from a resource that is not managed by terraform 
+- allows data to be fetched or computed from elsewhere in terraform configuration
+
+ex:
+    data "aws_ami" "example"{
+        executable_users = ["self"]
+        most_recent = true
+        name_regex = "^myami-\\d{3}"
+        owners = ["self"]
+
+        filter {
+            name="name"
+            values = ["myami-*"]
+        }
+        filter {
+            name="root-device-type"
+            values=["ebs"]
+        }
+        filter {
+            name="virtualization-type"
+            values=["hvm"]
+        }
+    }
+
+------------------------------

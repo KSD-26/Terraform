@@ -1,0 +1,94 @@
+`Modules`
+
+- containers for multiple reources that are used together
+- consists of a collection of .tf and/or .tf.json files kept together in a directory
+- main way to package and reuse resource configurations with terraform
+- can define inputs/outputs,enforce constraints and provision a number of resources per invocation
+- can enforce security and regulory constraints
+- are useful as they allow us define reusable blocks of terraform code 
+- of which you can have many instances in the main terraform project
+- root module calls child module
+    - root modules are resources defined in the .tf files in the main working directory
+
+`Module Sources`
+- local Path :: must start with either ./ or ../
+- Terraform Registry
+- Github
+- S3 
+
+`Local values in Modules`
+- a "local" assigns a name to an expression, allowing it to be used multiple times
+- expression of a local can refer to other locals
+- reference cycles are not allowed
+- group logically related locals into a single block
+
+`Module - Root and Child modules`
+- every terraform configuration has atleast one module, known as the ROOT module
+- ROOT module consists of the resources defined in the .tf files in the main working directory
+- a module can call other modules which allows you to include the child modules resources
+- a module can include a module block that is the calling module of the child module
+    ex:
+        module "servers"{ #module servers = root module
+            source="./app-cluster" #app-cluster = child module
+            servers=5
+        }
+
+`Module Outputs`
+- Resource defined in a module are encapsulated, so calling module cannot access their attributes directly
+- a child module can declare OUTPUT values to selectively export certain values to be accessed by the calling module
+    ex:
+        output "instance_ip_addr"{
+            value=aws_instance.server.private_ip
+        }
+
+`Module - sensitive=true`
+- output can be marked as containing SENSITIVE material
+- sensitive=true prevents Terraformfrom showing value in list of outputs at the end of terraform apply
+- Sensitive output values are STILL RECORDED in terraform.tfstate and visible to anyone with access terraform.tfstate
+    ex:
+        output "db_password"{
+            value=aws_db_instance.db.password
+            sensitive=true
+        }
+
+`module - versions`
+- it is NOT mandatory to include module version argument when pulling code from terraform Registry
+- explicitly constrain version numbers for external modules to avoid unwated changes
+- version constraints are supported for modules installed from:
+    - Terraform Registry :: Reference <NAMESPACE>/<NAME>/<PROVIDER>
+    - Private Registry :: Reference <HOSTNAME>/<NAMESPACE>/<NAME>/<PROVIDER>
+    - specifying a VERSION is mandatory when fetching a module
+
+    ex:
+        #public Registry
+        module "consul"{
+            source="hashicorp/consul/aws"
+            version="0.0.5"
+            servers=3
+        }
+
+        #private Registry
+        module "vpc"{
+            source="app.terraform.io/example-corp/vpc/aws"
+            version="0.9.3"
+        }
+
+`Create your own module`
+- Create module for S3
+    variable "s3_name"{}
+
+    resource "aws_s3_bucket" "my_bucket"{
+        name=var.s3_name
+    }
+
+    output "bucket_id"{
+        value=aws_s3_bucket.bucket.id
+    }
+
+- Use S3 module
+    module "my_sample_bucket"{
+        s3_name="sample_bucket"
+        source="<path to module folder>"
+    }
+
+-----------------------------------------------------------------------------------------------

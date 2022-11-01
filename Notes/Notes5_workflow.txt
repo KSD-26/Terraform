@@ -1,0 +1,8 @@
+`Terraform workflow/lifecycle`
+
+1. terraform init :: Prepare your working directory for other command
+2. terraform plan :: show changes required by the current configuration
+3. terraform apply :: create, update, or delete infrastructure
+4. terraform destroy ::  destroy previously created infrastructure
+
+----------------------

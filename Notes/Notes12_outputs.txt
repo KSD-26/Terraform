@@ -1,0 +1,12 @@
+`Output Values`
+
+- shows a piece of data after terraform successfully completes
+- are useful as they echo values from terraform to the command line after the completeion
+- can be used as input between modules
+
+    ex:
+        output "instance_ip_addr"{
+            value=aws_instance.server.private_ip
+        }
+
+----------------------------------------------------------

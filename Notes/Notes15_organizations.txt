@@ -1,0 +1,25 @@
+`Organizations`
+                            --------------- Development Organizations
+                            |
+                            |
+Terraform Enterprise ---------------------- Testing Organizations
+                            |
+                            |
+                            --------------- Production Organizations
+
+
+- are shared spaces for teams to collaborate on workspaces
+- teams are groups of terraform cloud users within an organization
+- to delgate provisioning work the organization can grant workspace permissions to specific teams
+- teams can only have permissions on workspaces within their organization, although any user in a team can belong to other teams in other organization
+
+    example hierarchy:
+        - Development Organization
+            - Networking workspace :: VPC and S3
+            - Persistence workspace :: S3 and Databases
+            - compute workspace :: EKS and ASG
+            - Shared Services workspace :: SNS and SQS and Lambda
+        - Testing Organization
+        - Production Organization
+
+--------------------------------------------------------------------------

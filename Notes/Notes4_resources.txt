@@ -1,0 +1,51 @@
+`Resources`
+- allows you to define what you want to create in real world
+
+`Resource Block`
+- describes one or more infrastructure objects
+ex: virtual network, compute instances, dns record
+
+- declares a resource of a:
+    + given type "aws_instance"
+    + given name "my_instance"
+
+ex:
+    resource "aws_instance" "my_instance"{
+        ami = "ami-1234qwerty"
+        instance_type = "t2.micro"
+    }
+
+    where::
+        1. resource type  = aws_instance
+        2. local resource name = my_instance
+        3. argument name = ami, instance_type
+        4. argument value =  ami-1234qwerty,t2.micro
+
+`Implicit dependency in Resource Block`
+- Terraform will automatically manage Implicit dependency by find reference objects and creating an Implicit ordering
+
+ex:
+    resource "aws_eip" "my_eip"{
+        vpc = "true"
+    }
+
+    resource "aws_instance" "my_instance"{
+        ami = "ami-1234qwerty"
+        instance_type = "t2.micro"
+        public_ip = aws_eip.my_eip.private_ip
+    }
+
+`Explicit dependency in Resource Block`
+- is only required when resource relies on another resource behavior
+
+ex:
+    resource "aws_s3_bucket" "example"{
+        acl = "private"
+    }
+
+    resource "aws_instance" "my_instance"{
+        instance_type = "t2.micro"
+        depends_on = [aws_s3_bucket.example]
+    }
+
+-----------------------
