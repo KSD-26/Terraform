@@ -1,0 +1,56 @@
+`Terraform - Flavours`
+
+Terraform comes in five Flavours:
+1. open source - the binary you download and run at home 
+2. cloud free
+3. cloud team
+4. cloud business
+5. self hosted Enterprise (ex: tfe)
+
+Terraform offerings
+- Terraform Cloud
+    - free
+    - Team
+    - business
+        - SSO 
+        - auditing
+        - self-hosted terraformcloud agents
+            - terraform cloud agents allow terraform cloud to communicate with isolated, private or on-premises infrastructure
+            - terraform cloud agents can establish a simple connection between your environment and terraform cloud which allows for provisioning operations and management
+        - private data center Networking
+        - clustering
+
+- Terraform Self-Hosted Enterprise (ex: TFE)
+    - internally hosted product to run terraform at scale
+    - terraform plan and terraform apply happens on the TFE servers
+    - state is stored on TFE and TFE provides state locking
+    - TFE also supports the Sentinel Policy Engine
+
+Enterprise offerings
+- Sentinel
+    - Sentinel is an embedded Policy as Code framework
+    - Sentinel enables fine grained logic based control policy decisions
+    - Sentinel is an embedded proactive policy as code framework
+    - Sentinel use cases:
+        - verify if ec2 instaces have tags
+        - verify if the S3 buckets have encryption enabled
+    - Sentinel execution sequence:
+        - terraform plan
+        - Sentinel checks
+        - terraform apply
+
+- Enterprise state security
+    - treat terraform.tfstate as sensitive
+    - Encrypt terraform.tfstate at rest
+    - encrypt terraform.tfstate in transit with TLS 
+    - Perform audit on State access and operations
+    - S3 backend supports encryption at rest 
+
+- Remote Backend 
+    - remote backend stores terraform.tfstate and supports running operations on terraform cloud
+    - full remote operations include:
+        - executing terraform plan remotely on terraform cloud environment
+        - executing terraform apply remotely on terraform cloud environment
+        - with log streaming to back to a local terminal
+
+------------------------------------------------------------------------------------

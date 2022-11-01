@@ -1,0 +1,20 @@
+`Providers` - 3 types
+1. official - maintained by Hashicorp
+2. Varified - mainted by vendor contributer
+3. Community - maintained by Community
+
+ex:
+    terraform{
+        required_providers{
+            aws = {
+                source = "hashicorp/aws"
+                version="4.9.0"
+            }
+        }
+    }
+
+    provider "aws"{
+        #configuration options
+    }
+
+---------------------

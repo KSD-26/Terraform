@@ -1,0 +1,184 @@
+Commands:
+
+1. terraform init
+    - initialize provider before it can be used
+    - downloads all required plugins associated with the specified provider
+    - DOES NOT create sample files
+    - stores files in .terraform dir
+    - if you add, change or update your modules or providers you need to run terraform init again
+
+2. terraform init -upgrade
+    - to upgrade to the latest acceptable version of each provider
+
+3. terraform alias
+    - have multiple provider instances
+    - a provider block without alias set is known as default provider configuration
+    - when alias is set it creates additional provider configuration
+
+    ex:
+        # resources that begin with `aws_` will use this as default. can be refrenced as `aws` 
+        provider "aws" {
+            region = "us-east-1"
+        }
+
+        # additional provider, refrenced as `aws.west`
+        provider "aws"{
+            alias = "west"
+            region = "us-west-2"
+        }
+
+4. terraform state list 
+    - list resource in terraform.tfstate
+
+5. terraform state mv
+    - move/rename items in terraform.tfstate
+
+6. terraform state pull
+    - download and output terraform.tfstate
+
+7. terraform state rm
+    - remove items from terraform.tfstate
+
+8. terraform state show
+    - show attributes from a single resource in terraform.tfstate
+
+9. terraform import
+    - import existing infrastructure that has been created by some other means
+    - imports existing resources to terraform.tfstate but DOESNOT  generate configuration files **IMPORTANT**
+    - prior running terraform import write the corresponsing resource configuration block to which the resource will be mapped
+    ex:
+        terraform import aws_instance.myec2 <instance_id>
+
+10. terraform lock
+    - must be supported by backend to run
+    - is used to lock the terraform.tfstate from any write operations
+
+
+11. terraform force-unlock
+    - will manually unlock terraform.tfstate if manual unlock failed
+
+    ex:
+        terraform force-unlock LOCK_ID [DIRECTORY]
+
+12. terraform plan   (https://www.terraform.io/cli/commands/plan)
+    - used to create eecution plan
+    - DOES NOT modify infrastructure
+    - DOES perform a `terraform refresh` unless explicitly disabled
+    - determines what actions are required to achieve desired state
+
+13. terraform plan -refresh
+
+14. terraform plan -target
+
+15. terraform plan -destroy
+    - preview what resources will be created or destroyed
+
+16. terraform apply   (https://www.terraform.io/cli/commands/apply)
+    - execute plan and create infrastructure
+    - can change, create and destroy resources but cannot import any resource
+
+17. terraform apply -auto-approve
+    - akip intactive approval of plan before applying
+
+18. terraform destroy   (https://www.terraform.io/cli/commands/destroy)
+    - deprovision the infrastructure
+    - opposite of terraform apply
+    - used to destroy terraform manged resources
+    - NOTE: removing a configuration block from file also destroys terraform managed resources when running terraform apply
+
+19. terraform console
+    - provides an interactive console for evaluating Expressions
+    - can be used to experiment with expression syntax and built-in functions
+
+20. terraform workspace new development
+    - create new workspace
+    - creates a new workspace and switches you into the new workspace
+
+21. terraform workspace select production
+    - switch to a specific workspace
+
+22. terraform workspace delete development
+    - delete a terraform workspace
+
+23. terraform fmt 
+    - make it pretty
+    - is used to rewrite  terraform configuration files to canonical format and style
+    - canonical- conforming to a general rule or acceptable procedure
+
+24. terraform validate
+    - validate a terraform configuration/configuration files in a project
+    - runs checks to verify if the configuration is syntactically valid 
+        - useful for verification of reusable modules including correctness of attribute names and value types
+    - it is safe to run terraform validate before terraform plan
+    - terraform validate requires terraform init to have been run at least once 
+
+25. terraform output
+    - is used to extract the value of an output variable from terraform.tfstate file
+    ex:
+        terraform output <value=iam_names>
+
+26. terraform graph
+    - show me the dependency graph
+    - terraform builds a dependency graph from terraform configuration files and walks the graph to:
+        - generate plans
+        - refresh state
+    - terraform graph command is used to generate a visual representation of the terraform configuration or execution plan
+    - the output of terraform graph command is in the DOT format **IMPORTANT**
+        - DOT is a graph description language
+    - Notations:
+        - Squares are Resource Node :: represents a Single resource
+        - Ovals are Resource Meta-Nodes :: represents a group of resources
+        - Diamonds are Provider configuration Nodes - represents the Provider 
+
+27. terraform taint 
+    - DONOT want this anymore
+    - Deprecated for Terraform v0.15.2 and late, use -replace option with terraform apply **IMPORTANT**
+    - terraform taint is used to manually mark a resource as tainted
+    - this forces resource to be destroyed and recreated on next terraform apply
+    ex:
+        terraform taint "module.couchbase.aws_instance.cb_node[9]"
+
+28. terraform refresh
+    - is used to reconsile terraform.tfstate with real world use
+    - does modify terraform.tfstate but not real world state
+    - various command run terraform refresh implicitly **IMPORTANT**
+        - terraform plan
+        - terraform apply
+        - terraform destroy
+    - These commands DO NOT run terraform refresh
+        - terraform init
+        - terraform import
+
+29. terraform apply -replace=<address>
+    - will force a resource to be destroyed and created
+
+---------------------------------------
+
+Some important examples:
+
+count                  = "${var.instance_count}"
+cidr_block        = "${cidrsubnet(var.network_cidr, 2, count.index + 2)}"
+availability_zone = "${element(var.availability_zones, count.index)}"
+ami                    = "${lookup(var.ami_ids, "us-west-2")}"
+user_data              = "${file("user_data.sh")}"
+
+########
+terraform apply -var="servername=calabvm" -var="subnet=10.0.1.0/24"
+
+#############
+#backend to store the terraform.tfstate to S3
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "3.7"
+    }
+  }
+  backend "s3" {
+    bucket = "terraformstate29cebf3d"
+    key    = "calabs/production/us-west-2/rslab/terraform.tfstate"
+    region = "us-west-2"
+    dynamodb_table = "terraform-state-lock"
+    encrypt        = true
+  }
+}
